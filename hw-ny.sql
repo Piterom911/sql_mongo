@@ -43,7 +43,7 @@ ON c.headman_id = t.id;
 SELECT s.name, t.name
 FROM students as s
 JOIN students2courses as s2c
-ON s.id = s2c.course_id
+ON s.id = s2c.student_id
 JOIN courses as c
 ON c.id = s2c.course_id
 JOIN teachers as t
