@@ -1,0 +1,383 @@
+// use db_name
+// db.createCollection('new_collection')
+// db.collection_name.insertOne({})
+// db.collection_name.insertMany([{}, {}, ...])
+// db.collection_name.find({Условие}, {Проекция/Пагинация массива})
+// db.collection_name.find().skip()
+// db.collection_name.find().limit()
+// db.collection_name.find().sort()
+// db.collection_name.replaceOne(filter, update, [options])
+// db.collection_name.updateOne()
+// db.collection_name.updateMany()
+
+// Удаление данных/документов
+// db.collection_name.deleteOne({Условие}) - удаляет один документ
+// db.collection_name.deleteMany({Условие}) - удаляет несколько документов
+
+db.workers.insertMany([
+  {
+    _id: 1,
+    firstname: "Inga",
+    lastname: "Petrova",
+    age: 27,
+    position: "Barista",
+    salary: 1500,
+    skills: ["preparing drinks", "cleaning equipment"],
+  },
+  {
+    _id: 2,
+    firstname: "Boris",
+    lastname: "Orlov",
+    age: 36,
+    position: "Server",
+    salary: 2400,
+    skills: ["taking orders", "suggesting meals", "taking payments"],
+  },
+  {
+    _id: 3,
+    firstname: "Ivan",
+    lastname: "Demidov",
+    age: 32,
+    position: "Chef",
+    salary: 3200,
+    skills: ["preparing food", "baking bread"],
+  },
+  {
+    _id: 4,
+    firstname: "Marina",
+    lastname: "Sidorov",
+    age: 22,
+    position: "Hostess",
+    salary: 1700,
+    skills: ["greeting guests", "seating guests", "answering phone calls"],
+  },
+  {
+    _id: 5,
+    firstname: "Olga",
+    lastname: "Ivanova",
+    age: 43,
+    position: "Sommelier",
+    salary: 2500,
+    skills: ["curating a wine list", "creating wine pairings"],
+  },
+]);
+
+// Удалить сотрудника с именем Inga.
+db.workers.deleteOne({ firstname: "Inga" });
+
+// Удалить сотрудников, которым меньше 30.
+db.workers.deleteMany({ age: { $lt: 30 } });
+
+// Удалить все документы из коллекции
+db.workers.deleteMany({});
+
+// Удалить коллекцию workers
+db.workers.drop();
+
+// Удалить коллекцию staff
+db.staff.drop();
+
+db.staff.insertMany([
+  {
+    name: "Alice",
+    age: 30,
+    department: "HR",
+    skills: ["communication", "organization"],
+    projects: ["Project A", "Project B"],
+  },
+  {
+    name: "Bob",
+    age: 35,
+    department: "IT",
+    skills: ["programming", "problem-solving"],
+    projects: ["Project C", "Project D"],
+  },
+  {
+    name: "Charlie",
+    age: 30,
+    department: "Finance",
+    skills: ["financial analysis", "budgeting"],
+    projects: ["Project E"],
+  },
+  {
+    name: "John",
+    age: 18,
+    department: "IT",
+    skills: ["teamwork", "organization"],
+    projects: ["Project A", "Project D"],
+  },
+  {
+    name: "Lily",
+    age: 35,
+    department: "IT",
+    skills: ["programming", "problem-solving"],
+    projects: ["Project C", "Project E"],
+  },
+  {
+    name: "Lucas",
+    age: 30,
+    department: "Finance",
+    skills: ["financial analysis", "budgeting", "problem-solving"],
+    projects: ["Project E", "Project A"],
+  },
+  {
+    name: "Van",
+    age: 30,
+    department: "Finance",
+    skills: ["teamwork", "organization", "financial analysis"],
+    projects: ["Project E", "Project D"],
+  },
+  {
+    name: "Laura",
+    age: 31,
+    department: "IT",
+    skills: ["programming", "problem-solving"],
+    projects: ["Project A"],
+  },
+  {
+    name: "Maria",
+    age: 28,
+    department: "HR",
+    skills: ["communication", "organization", "problem-solving"],
+    projects: ["Project A", "Project D"],
+  },
+]);
+
+// Агрегация
+// Кол/во документов в коллекции
+// db.collection_name.countDocuments()
+// db.collection_name.find().count()
+// Вывести кол/во докумнетов в коллекции staff
+db.staff.countDocuments();
+db.staff.find().count();
+
+// Вывести кол/во сотрудников из департамента IT
+db.staff.find({ department: "IT" }).count();
+
+// Вывести кол/во сотурдников, которым больше 30.
+db.staff.find({ age: { $gt: 30 } }).count();
+
+// Функция distinct
+// Вывести названия департаментов всех сотрудников
+db.staff.find({}, { department: 1, _id: 0 });
+// Вывети список департманетов (без дубликатов)
+db.staff.distinct("department");
+
+// Функция aggregate
+// db.collection_name.aggregate([Операторы функции aggregate])
+// Операторы функции aggregate:
+// $match - Фильтрация/условие
+// $project - Проекция(поля, которые нужно вывести)
+// $skip - Пагинация(кол/во документов, которое нужно пропусить)
+// $limit - Пагинация(кол/во документов, которое нужно вывести)
+// $sort - Сортировка
+// $group - Группировка
+// Агрегатные операторы
+// $sum
+// $avg
+// $min
+// $max
+// db.collection_name.aggregate([
+//     {$match: {Условие}},
+//     {$project: {Проекция}}, //поле1: 1, поле2: 0
+//     {$sort: {Сортировка}}, // поле1: 1/-1
+//     {$skip: {Пагинация}}, // кол/во
+//     {$limit: {Пагинация}}, // кол/во
+//     {$group: {_id: null(если нет группировки)/'$поле'(поле группировки), имя_агрегатного_поля: {агрегатный_опратор: '$поле'}}}
+// ])
+
+db.workers2.insertMany([
+  {
+    _id: 1,
+    firstname: "Inga",
+    lastname: "Petrova",
+    age: 27,
+    position: "Barista",
+    salary: 1500,
+    skills: ["preparing drinks", "cleaning equipment"],
+  },
+  {
+    _id: 2,
+    firstname: "Boris",
+    lastname: "Orlov",
+    age: 36,
+    position: "Server",
+    salary: 2400,
+    skills: ["taking orders", "suggesting meals", "taking payments"],
+  },
+  {
+    _id: 3,
+    firstname: "Ivan",
+    lastname: "Demidov",
+    age: 32,
+    position: "Chef",
+    salary: 3200,
+    skills: ["preparing food", "baking bread"],
+  },
+  {
+    _id: 4,
+    firstname: "Marina",
+    lastname: "Sidorov",
+    age: 22,
+    position: "Hostess",
+    salary: 1700,
+    skills: ["greeting guests", "seating guests", "answering phone calls"],
+  },
+  {
+    _id: 5,
+    firstname: "Olga",
+    lastname: "Ivanova",
+    age: 43,
+    position: "Sommelier",
+    salary: 2500,
+    skills: ["curating a wine list", "creating wine pairings"],
+  },
+  {
+    _id: 6,
+    firstname: "Inga",
+    lastname: "Petrova",
+    age: 45,
+    position: "IT programmer",
+    salary: 7500,
+    skills: ["Java", "Python"],
+  },
+  {
+    _id: 7,
+    firstname: "Boris",
+    lastname: "Ivanov",
+    age: 36,
+    position: "Server",
+    salary: 6400,
+    skills: ["taking payments"],
+  },
+
+  {
+    _id: 8,
+    firstname: "Inga",
+    lastname: "Ivanova",
+    age: 36,
+    position: "Sommelier",
+    salary: 2500,
+    skills: ["curating a wine list", "creating wine pairings"],
+  },
+]);
+
+// Найти сумму зарплат всех сотрудников.
+db.workers2.aggregate([
+  { $group: { _id: null, total_sum: { $sum: "$salary" } } },
+]);
+
+// Найти среднюю зарплату в компании.
+db.workers2.aggregate([
+  { $group: { _id: null, avg_salary: { $avg: "$salary" } } },
+]);
+// mysql
+// select avg(salary) as avg_salary
+// from workers2;
+
+// Найти сумму зарлат сотрудников, которым больше 30.
+db.workers2.aggregate([
+  { $match: { age: { $gt: 30 } } },
+  { $group: { _id: null, total_sum: { $sum: "$salary" } } },
+]);
+// mysql
+// select sum(salary) as total_sum
+// from workers2
+// where age > 30;
+
+db.workers2.aggregate([
+  { $group: { _id: "$position", total_sum: { $sum: "$salary" } } },
+]);
+
+// Найти суммы зарплат по должностям сотрудников, которым больше 30.
+db.workers2.aggregate([
+  { $match: { age: { $gt: 30 } } },
+  { $group: { _id: "$position", total_sum: { $sum: "$salary" } } },
+]);
+// mysql
+// select position as _id, sum(salary) as total_sum
+// from workers2
+// where age > 30
+// group by position;
+
+// 1. Найти средние зарплаты по должностям.
+db.workers2.aggregate([
+  { $group: { _id: "$position", avg_salary: { $avg: "$salary" } } },
+]);
+
+// 2. Найти средний возраст среди всех сотрудников.
+db.workers2.aggregate([{ $group: { _id: null, avg_age: { $avg: "$age" } } }]);
+
+// 3. Найти сумму зарплат сотрудников, которые получают меньше 5000.
+db.workers2.aggregate([
+  { $match: { salary: { $lt: 5000 } } },
+  { $group: { _id: null, total_sum: { $sum: "$salary" } } },
+]);
+
+// Найти суммы зарплат по должностям. Вывести только те, где сумма больше 5000.
+db.workers2.aggregate([
+  { $group: { _id: "$position", total_sum: { $sum: "$salary" } } },
+  { $match: { total_sum: { $gt: 5000 } } },
+]);
+// mysql
+// select position, sum(salary) as total_sum
+// from workers2
+// group by position
+// having total_sum > 5000;
+
+// Найти суммы зарплат по должностям. Отсортировать по возрастанию сумм.
+db.workers2.aggregate([
+  { $group: { _id: "$position", total_sum: { $sum: "$salary" } } },
+  { $sort: { total_sum: 1 } },
+]);
+// mysql
+// select position, sum(salary) as total_sum
+// from workers2
+// group by position
+// order by total_sum asc;
+
+// Найти максимальную зарплату среди всех сотрудников.
+db.workers2.aggregate([
+  { $group: { _id: null, max_salary: { $max: "$salary" } } },
+]);
+
+// Найти минимальные зарплаты по должностям.
+db.workers2.aggregate([
+  { $group: { _id: "$position", min_salary: { $min: "$salary" } } },
+]);
+
+// Найти максимальную зарплату среди сотрудников старше 30 лет.
+db.workers2.aggregate([
+  { $match: { age: { $gt: 30 } } },
+  { $group: { _id: null, max_salary: { $max: "$salary" } } },
+]);
+
+// Найти максимальные зарплаты по должностям. Отсортировать по убыванию максимальных зарплат.
+db.workers2.aggregate([
+  { $group: { _id: "$position", max_salary: { $max: "$salary" } } },
+  { $sort: { max_salary: -1 } },
+]);
+
+// Найти минимальные зарплаты по должностям. Вывести те, где минимальные зарплаты меньше 3000.
+db.workers2.aggregate([
+  { $group: { _id: "$position", min_salary: { $min: "$salary" } } },
+  { $match: { min_salary: { $lt: 3000 } } },
+]);
+
+// Найти кол/во сотрудников с помощью aggregate и дать полю название workers_count.
+db.workers2.aggregate([{ $count: "workers_count" }]);
+// Найти кол/во сотрудников, которые получают больше 5000.
+db.workers2.aggregate([
+  { $match: { salary: { $gt: 5000 } } },
+  { $count: "high_salary_workers_count" },
+]);
+// Найти кол/во сотрудников по должностям.
+db.workers2.aggregate([
+  { $group: { _id: "$position", workers_count: { $sum: 1 } } },
+]);
+// {$sum: 1} - заменяет функцию count
+
+// Посчитать, сколько работников с одинаковыми именами (firstname)
+db.workers2.aggregate([
+  { $group: { _id: "$firstname", workers_count: { $sum: 1 } } },
+]);
